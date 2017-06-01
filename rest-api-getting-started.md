@@ -208,12 +208,12 @@ We'll show some demo requests and briefly explain what is happening. See the [Re
 
 The steps are roughly as follows:
 
-1. [Create your organization](#Create-your-organization)
-2. [Create a building](#Create-a-building)
-3. [Create a space](#Create-a-space)
-4. [Relate the space to the building](#Relate-the-space-to-the-building)
-5. [Create a listing](#Create-a-listing) (and relate it to space and organization at the same time!)
-6. [View the fruits of your labor](#View-the-fruits-of-your-labor)
+1. [Create your organization](#create-your-organization)
+2. [Create a building](#create-a-building)
+3. [Create a space](#create-a-space)
+4. [Relate the space to the building](#relate-the-space-to-the-building)
+5. [Create a listing](#create-a-listing) (and relate it to space and organization at the same time!)
+6. [View the fruits of your labor](#view-the-fruits-of-your-labor)
 
 #### Create your Organization
 
