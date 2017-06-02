@@ -20,6 +20,7 @@ Read our [Getting Started Tutorial](rest-api-getting-started.md) for a crash cou
 
 - [Access and refresh tokens](reference/access-and-refresh-tokens.md)
 - Understanding JSON API
+- [Querying and filtering the API](reference/filters-and-queries.md)
 - ERD Diagram
 - RealMassive Schema
 - RealMassive Schema field options
