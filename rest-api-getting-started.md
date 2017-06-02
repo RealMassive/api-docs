@@ -177,9 +177,14 @@ Assume you created a `Building` and `Space` using what you learned above. You no
 passing to that route the payload with the space id. This relates the space to the specified building.
 
 Let's consider another example, where we want to create a `Contact` for a `Lease.` You would do the following:
-1. `POST /contacts` to create the new contact. Store the ID returned.
-2. `POST /leases` to create the new lease. Store the ID returned.
-3. `POST /leases/{leaseID}/contacts` to add that contact to that space.
+1. `POST /contacts` to create the new contact. Store the ID returned. The contact is stored in the databse:
+<img src="images/2-1-contacts.png" height="45px" />
+
+2. `POST /leases` to create the new lease. Store the ID returned. The lease is added to the database, but is still unrelated to the contact:
+<img src="images/2-3-contacts-leases-unrelated.png" height="125px" />
+
+3. `POST /leases/{leaseID}/contacts` to add that contact to that space. The lease and contact are now related; the "Lease has a contact":
+<img src="images/2-3-contacts-leases-related.png" height="125px" />
 
 Now that you understand the basic pattern, the next thing to know is how permissions and data are handled. 
 
@@ -269,6 +274,10 @@ After a successful creation, we receive the following response:
 
 Hold onto the ID for later use.
 
+Current State of the Database:
+
+<img src="images/3-1-org.png" height="65px" />
+
 #### Create a building
 
 Similar to creating an organization, we POST to `/buildings` with a JSON payload.
@@ -350,6 +359,11 @@ In order for buildings to show up on RealMassive's search engine, it must have a
 
 [**You can see the total list of attributes for various schemas in this gist.**](https://gist.github.com/wayspurrchen/a272683dbb75f534dab4115f5616426f)
 
+Current State of the Database:
+
+<img src="images/3-2-org-building.png" height="105px" />
+
+
 #### Creating a Space
 
 Once that's complete, you can create a Space that will be related to the building (we will do the relating in a different step).
@@ -419,6 +433,10 @@ Response from the server:
 }
 ```
 
+Current State of the Database:
+
+<img src="images/3-3-org-building-space.png" height="105px" />
+
 #### Relate the space to the building
 
 Now that we've created our building and space, we need to relate the building to the space so that we can see the space when we view the building. To do so, we POST a small entity reference object to either `/buildings/<building_id>/spaces` or `/spaces/<spaces_id>/buildings` - it doesn't matter which. I'll use the former:
@@ -476,6 +494,10 @@ For the response, we receive the data for whatever entity reference we POSTed, a
   }
 }
 ```
+
+Current State of the Database:
+
+<img src="images/3-4-org-building-space-related1.png" height="115px" />
 
 #### Create a listing (and relate it to space and organization at the same time!)
 
@@ -588,6 +610,10 @@ You'll see that the response shows a lease that has been created with our attrib
   }
 }
 ```
+
+Current State of the Database:
+
+<img src="images/3-4-org-building-space-related2.png" height="165px" />
 
 #### View the fruits of your labor
 
