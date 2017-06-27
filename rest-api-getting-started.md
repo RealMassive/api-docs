@@ -3,23 +3,34 @@ RealMassive REST API Programming Guide
 
 Revision: Draft-1
 
-This guide will show you how to programmatically create and manage inventory on RealMassive using our REST API. Topics covered include: (1) creating and relating entities; (2) permissions; (3) entity relationships; (4) and finally, examples.
+Welcome!
+
+This guide will show you how to programmatically create and manage inventory on RealMassive using the RealMassive API. The topics presented here are the low-level operations _currently_ required to manage inventory via API. These topics are:
+ 1. creating and relating entities; 
+ 1. permissions; 
+ 1. entity relationships; 
+ 1. and finally, examples.
 
 Before reading this guide, please review the resources in our [Quickstart Guide](https://realmassive.github.io/realmassive.github.io/index.html). This guide assumes you have read and understand all content therein, including JSON API and authorization (tokens).
 
 
 # Creating and Relating Entities
 
-The core patttern for managing data on RealMassive through our REST API has two steps: _Create_ & _Relate_.
+The core patttern for creating data on RealMassive through our REST API has two steps: _Create_ & _Relate_.
 
 ## 1. Create one or more Entities
 
 Entities are objects like `Buildings`, `Spaces`, `Leases`, `Subleases`, `Contacts`, `Organizations`, etc. These represent real world concepts from commercial real estate. 
 * You create entities by sending a `POST` request with an appropriate JSON payload.
-* Responses to your successful requests will contain a new identifier (`id`) for the newly created entity. Store that id somewhere, you will need it for later steps.
-* Each entity's full structure can be found in our API documentation here (https://app.swaggerhub.com/apis/inchoate/real-massive_api/2.0). Fields not editable by the user are: `created`, `id`, and `updated`. Those can be safely ignored when creating entities.
+* Responses to your successful requests will contain a new, globally unique, identifier (`id`) for the newly created entity. Store that id somewhere, you will need it for later steps.
+* Each entity's full structure can be found in our [API documentation](https://app.swaggerhub.com/apis/inchoate/real-massive_api/2.0). The read-only fields **not editable** by the user are: `created`, `id`, and `updated`. Those can be safely ignored when creating entities.
+
+Let's take a look at some examples. We will create an `Organization` and a `Building` by sending a POST request to the server for each.
 
 ### Example 1. Create an Organization
+
+In order to create an `Organization` you should first figure out org data are required. See our [API documentation](https://app.swaggerhub.com/apis/inchoate/real-massive_api/2.0) for the full list. We suggest you provide at least a name. The more data you provide, the better you will be represented in the open CRE marketplace. You can create an organization using a `POST` request formatted as in the following example.
+
 #### Request
 ```shell
 curl -X POST \
@@ -84,7 +95,13 @@ curl -X POST \
 }
 ```
 
+Save the `id` and `type` returned from the server. If managing inventory you will need that info for tying listings and brokers to your organization.
+
+
 ### Example 2. Create a Building
+
+Just like the above, in order to create a `Building` you should first figure out org data are required. See our [API documentation](https://app.swaggerhub.com/apis/inchoate/real-massive_api/2.0) for the full list. We suggest you provide at least as much data as possible. Buildings are extremely important and deserve the best data. You can create a building by `POST`ing a request formatted as in the following example.
+
 #### Request
 
 ```shell
@@ -624,42 +641,118 @@ Once you've done all of these steps, if you specified a proper latitude and long
 
 The following diagrams illustrate how our entities fit together to model the domain of commercial real estate.
 
-Users
+
+#### Users
+<img src="images/erd-users0.png" height="65px" />
+
+A `User` is someone who will login to RealMassive or use an API to manage data. `tos_status` reflects whether or not this user has accepted our terms of service. If you haven't accepted out terms, you cannot use our system. A `User` is little more than an email address and unique ID.
+
+##### Users, Teams and Permissions
+
+<img src="images/erd-users1.png" height="95px" />
+
+Users can be have `Memberships` in zero or more `Teams`. This is how permissions are handled. You add `Users` to teams. Then, you add other stuff to teams with a given permission of: `read` or `admin`. If a user is part of a team that has `admin` privileges, for example, on a building, then any user in that team can edit that building. This is similar to the GitHub permissions model.
+
+##### Users and Cards
+
+<img src="images/erd-users2.png" height="205px" />
+
+Finally, users can be related to zero or more `Cards`. Discussed in detail below, `Cards` are like business cards for your brokers/contacts. `Cards` allow brokers/contacts to have listings on RealMassive without having a full `User` account. Brokers/contacts can have many cards, tailored to their desired use case.
 
 
-Organizations
+#### Organizations
+
+<img src="images/erd-orgs0.png" height="225px" />
+
+`Organizations` represent real world entities that partake in the business of commercial real estate. Organizations uniquely identify the listing agency or other CRE company, its brokers/contacts, and all its on- and off-market listings. A listing is a `Lease`, `Sublease`, or `Sale`. 
+
+<img src="images/erd-orgs1.png" height="385px" />
 
 
-Teams
+#### Teams
+
+<img src="images/erd-users1.png" height="125px" />
+
+As previously mentioned, `Teams` are used to control permissions. `Users` are added to a team through `Memberships`. Other entities are added to the team through `Permissions`. Users can control various assets through `Permissions` as shown below:
+
+<img src="images/erd-teams1.png" height="505px" />
+
+#### Buildings
+Buildings have quite a few data fields. We suggest you provide as much data as possible.
+
+##### Selling a Building
+Buildings can be for `Sale`. You can attach zero or more `Sales` _directly_ to a `Building` to list it for sale.
+
+<img src="images/erd-buildings0.png" height="505px" />
 
 
-Buildings
+##### Leasing or Subleasing Space within a Building
+
+Buildings aren't leased or subleased. The configured `Space` within a `Building` is `Leased` or `Subleased`. You can have as many `Spaces` inside a `Building` as you desire. You attach `Leases` and `Subleases` to `Space` to lease or sublease that space. You can have as many leases or subleases as desired on one space. A `Space` can only be related to one `Building`, though.
+
+<img src="images/erd-buildings1.png" height="505px" />
 
 
-Spaces
+#### Spaces
+<img src="images/erd-spaces0.png" height="255px" />
 
 
-Land
+#### Land
+##### Selling Land
+You can sell `Land` directly, just like you can sell a `Building` directly. Create the land object and attach the sale object directly to it.
+
+<img src="images/erd-land0.png" height="225px" />
+
+##### Selling Parcels of Land
+If you need to divvy your land up into `Parcels` you may do so. Simply create the desired number of Parcels and attach the appropriate `Sales` objects to them.
+
+The image below, shows that land can be directly sold or you can create parcels on the land and sell those.
+
+<img src="images/erd-land1.png" height="385px" />
 
 
 
-Parcels
+#### Parcels
+See [Land](/Land) to information on selling `Parcels` of `Land`.
+
+#### Listings: Lease, sublease, sales
+`Sales`, `Leases`, and `Subleases` are known simply as Listings. There is no direct Listing object, but it's a useful, collective term. 
+
+All Listings belong to an organization:
+
+<img src="images/realmassive_listings1.png" height="585px" />
 
 
+All Listings have one or more Contacts:
 
-Listings: Lease, sublease, sales
+<img src="images/realmassive_listings2.png" height="585px" />
 
+So, combining the information above on Leasing, and Subleasing space; and selling Land or Parcels; and Contacts and Organizations, this part of the model starts to unfold in full:
 
-Cards
-
-
-Contacts
-
-
-Attachments
+<img src="images/realmassive_listings0.png" height="385px" />
 
 
-Media
+#### Cards and Contacts
+Cards represent business cards for your brokers or contacts. You do not need a `User` to list space on RealMassive; you just need a `Card`. This is useful to allow marketing managers to add brokers to listings without having to get that broker to create a new account on RealMassive.
 
+You attach a `Card` to a Listing by creating a `Contact` relating the `Card` to the `Listing`. Recall that `Listing` is a placeholder term for a `Lease`, `Sublease` or `Sale`:
+
+<img src="images/erd_contact_cards0.png" height="425px" />
+
+Notice that `Contacts` -- the relationship between a `Card` and a `Listing` has a `precedence`. This allows you to order brokers/contacts on listings:
+
+<img src="images/erd_contact_cards1.png" height="85px" />
+
+
+#### Media and Attachments
+`Media` are images and brochures like JPGs, GIFs, PNGs, and PDFs. To add images to a `Listing` you upload the `Media` through our Media service:
+
+<img src="images/erd-media0.png" height="195px" />
+
+Then, you create an attachment to tie that particular piece of media back to your `Card`, `Building`, `Space`, `Parcel`, `Land`, etc:
+
+<img src="images/erd-media1.png" height="195px" />
+
+`Attachments`, like `Memberships` have precedence so you can order your media on an entity as you see fit.
 
 
