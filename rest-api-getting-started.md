@@ -6,9 +6,9 @@ Revision: Draft-1
 Welcome!
 
 This guide will show you how to programmatically create and manage inventory on RealMassive using the RealMassive API. The topics presented here are the low-level operations _currently_ required to manage inventory via API. These topics are:
- 1. creating and relating entities; 
- 1. permissions; 
- 1. entity relationships; 
+ 1. creating and relating entities;
+ 1. permissions;
+ 1. entity relationships;
  1. and finally, examples.
 
 Before reading this guide, please review the resources in our [Quickstart Guide](https://realmassive.github.io/realmassive.github.io/index.html). This guide assumes you have read and understand all content therein, including JSON API and authorization (tokens).
@@ -20,7 +20,7 @@ The core patttern for creating data on RealMassive through our REST API has two 
 
 ## 1. Create one or more Entities
 
-Entities are objects like `Buildings`, `Spaces`, `Leases`, `Subleases`, `Contacts`, `Organizations`, etc. These represent real world concepts from commercial real estate. 
+Entities are objects like `Buildings`, `Spaces`, `Leases`, `Subleases`, `Contacts`, `Organizations`, etc. These represent real world concepts from commercial real estate.
 * You create entities by sending a `POST` request with an appropriate JSON payload.
 * Responses to your successful requests will contain a new, globally unique, identifier (`id`) for the newly created entity. Store that id somewhere, you will need it for later steps.
 * Each entity's full structure can be found in our [API documentation](https://app.swaggerhub.com/apis/inchoate/real-massive_api/2.0). The read-only fields **not editable** by the user are: `created`, `id`, and `updated`. Those can be safely ignored when creating entities.
@@ -203,7 +203,7 @@ Let's consider another example, where we want to create a `Contact` for a `Lease
 3. `POST /leases/{leaseID}/contacts` to add that contact to that space. The lease and contact are now related; the "Lease has a contact":
 <img src="images/2-3-contacts-leases-related.png" height="125px" />
 
-Now that you understand the basic pattern, the next thing to know is how permissions and data are handled. 
+Now that you understand the basic pattern, the next thing to know is how permissions and data are handled.
 
 # Data Hierarchy and Permissions
 
@@ -664,7 +664,7 @@ Finally, users can be related to zero or more `Cards`. Discussed in detail below
 
 <img src="images/erd-orgs0.png" height="225px" />
 
-`Organizations` represent real world entities that partake in the business of commercial real estate. Organizations uniquely identify the listing agency or other CRE company, its brokers/contacts, and all its on- and off-market listings. A listing is a `Lease`, `Sublease`, or `Sale`. 
+`Organizations` represent real world entities that partake in the business of commercial real estate. Organizations uniquely identify the listing agency or other CRE company, its brokers/contacts, and all its on- and off-market listings. A listing is a `Lease`, `Sublease`, or `Sale`.
 
 <img src="images/erd-orgs1.png" height="385px" />
 
@@ -716,7 +716,7 @@ The image below, shows that land can be directly sold or you can create parcels 
 See [Land](/Land) to information on selling `Parcels` of `Land`.
 
 #### Listings: Lease, sublease, sales
-`Sales`, `Leases`, and `Subleases` are known simply as Listings. There is no direct Listing object, but it's a useful, collective term. 
+`Sales`, `Leases`, and `Subleases` are known simply as Listings. There is no direct Listing object, but it's a useful, collective term.
 
 All Listings belong to an organization:
 
@@ -736,6 +736,8 @@ So, combining the information above on Leasing, and Subleasing space; and sellin
 Cards represent business cards for your brokers or contacts. You do not need a `User` to list space on RealMassive; you just need a `Card`. This is useful to allow marketing managers to add brokers to listings without having to get that broker to create a new account on RealMassive.
 
 You attach a `Card` to a Listing by creating a `Contact` relating the `Card` to the `Listing`. Recall that `Listing` is a placeholder term for a `Lease`, `Sublease` or `Sale`:
+
+You can also attach a `Card` to an `Organization` through an `Affiliation`. The `Affiliation` contains information about the `Card's` role, within the organization, as well as how to order the cards when listing `Cards` belonging to an organization.
 
 <img src="images/erd_contact_cards0.png" height="425px" />
 
